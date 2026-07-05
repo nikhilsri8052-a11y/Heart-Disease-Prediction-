@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Risk Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="theme-toggle-wrap">
+        <button class="btn btn-outline-secondary rounded-pill theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <span class="me-2">☀</span>
+            <span>Light</span>
+        </button>
+    </div>
+
+    <main class="container py-5">
+        <header class="row mb-4">
+            <div class="col-lg-8">
+                <div class="text-uppercase small fw-semibold mb-3 text-accent">AI-Powered Health Screening</div>
+                <h1 class="display-5 fw-bold mb-3 hero-title">
+                    Heart Disease <span class="text-accent">Risk Predictor</span>
+                </h1>
+                <p class="lead text-muted mb-4">Enter a few key health indicators to estimate the chance of developing coronary heart disease in the next 10 years.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge rounded-pill text-bg-light border">⚡ Instant estimate</span>
+                    <span class="badge rounded-pill text-bg-light border">🩺 15 clinical inputs</span>
+                    <span class="badge rounded-pill text-bg-light border">🎓 Educational demo</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="card rounded-4 mb-4">
+            <div class="card-body p-4 p-md-5">
+                <form id="predictForm" action="/predict" method="post" novalidate>
+                    <div class="row g-4">
+
+                        <div class="col-12">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold" for="male">Sex</label>
+                                    <select class="form-select" id="male" name="male">
+                                        <option value="1">Male</option>
+                                        <option value="0">Female</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold" for="education">Education Level</label>
+                                    <select class="form-select" id="education" name="education">
+                                        <option value="1">No high school</option>
+                                        <option value="2">High school</option>
+                                        <option value="3">Some college</option>
+                                        <option value="4" selected>College graduate</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold" for="currentSmoker">Current Smoker</label>
+                                    <select class="form-select" id="currentSmoker" name="currentSmoker">
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold" for="BPMeds">Blood Pressure Medication</label>
+                                    <select class="form-select" id="BPMeds" name="BPMeds">
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold" for="prevalentStroke">Previous Stroke</label>
+                                    <select class="form-select" id="prevalentStroke" name="prevalentStroke">
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold" for="prevalentHyp">Hypertension</label>
+                                    <select class="form-select" id="prevalentHyp" name="prevalentHyp">
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold" for="diabetes">Diabetes</label>
+                                    <select class="form-select" id="diabetes" name="diabetes">
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="age" class="form-label fw-semibold">
+                                Age
+                                <span class="badge rounded-pill ms-2 text-bg-light" id="ageDisplay">— yrs</span>
+                            </label>
+                            <div class="slider-track-wrap">
+                                <input type="range" name="age" id="age" min="18" max="90" value="45" step="1">
+                                <div class="slider-fill" id="ageFill"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-2">
+                                <span>18</span><span>90 yrs</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="cigsPerDay" class="form-label fw-semibold">
+                                Cigarettes per Day
+                                <span class="badge rounded-pill ms-2 text-bg-light" id="cigsPerDayDisplay">—</span>
+                            </label>
+                            <div class="slider-track-wrap">
+                                <input type="range" name="cigsPerDay" id="cigsPerDay" min="0" max="60" value="0" step="1">
+                                <div class="slider-fill" id="cigsPerDayFill"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-2">
+                                <span>0</span><span>60</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="totChol" class="form-label fw-semibold">
+                                Total Cholesterol
+                                <span class="badge rounded-pill ms-2 text-bg-light" id="totCholDisplay">— mg/dL</span>
+                            </label>
+                            <div class="slider-track-wrap">
+                                <input type="range" name="totChol" id="totChol" min="100" max="450" value="200" step="1">
+                                <div class="slider-fill" id="totCholFill"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-2">
+                                <span>100</span><span>450 mg/dL</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="glucose" class="form-label fw-semibold">
+                                Glucose
+                                <span class="badge rounded-pill ms-2 text-bg-light" id="glucoseDisplay">— mg/dL</span>
+                            </label>
+                            <div class="slider-track-wrap">
+                                <input type="range" name="glucose" id="glucose" min="40" max="300" value="80" step="1">
+                                <div class="slider-fill" id="glucoseFill"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-2">
+                                <span>40</span><span>300 mg/dL</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="sysBP" class="form-label fw-semibold">
+                                Systolic BP
+                                <span class="badge rounded-pill ms-2 text-bg-light" id="sysBPDisplay">—</span>
+                            </label>
+                            <div class="slider-track-wrap">
+                                <input type="range" name="sysBP" id="sysBP" min="80" max="250" value="120" step="1">
+                                <div class="slider-fill" id="sysBPFill"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-2">
+                                <span>80</span><span>250</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="diaBP" class="form-label fw-semibold">
+                                Diastolic BP
+                                <span class="badge rounded-pill ms-2 text-bg-light" id="diaBPDisplay">—</span>
+                            </label>
+                            <div class="slider-track-wrap">
+                                <input type="range" name="diaBP" id="diaBP" min="40" max="150" value="80" step="1">
+                                <div class="slider-fill" id="diaBPFill"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-2">
+                                <span>40</span><span>150</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="BMI" class="form-label fw-semibold">
+                                BMI
+                                <span class="badge rounded-pill ms-2 text-bg-light" id="BMIDisplay">—</span>
+                            </label>
+                            <div class="slider-track-wrap">
+                                <input type="range" name="BMI" id="BMI" min="15" max="50" value="26" step="0.1">
+                                <div class="slider-fill" id="BMIFill"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-2">
+                                <span>15</span><span>50</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="heartRate" class="form-label fw-semibold">
+                                Heart Rate
+                                <span class="badge rounded-pill ms-2 text-bg-light" id="heartRateDisplay">— bpm</span>
+                            </label>
+                            <div class="slider-track-wrap">
+                                <input type="range" name="heartRate" id="heartRate" min="40" max="140" value="75" step="1">
+                                <div class="slider-fill" id="heartRateFill"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-2">
+                                <span>40</span><span>140 bpm</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="summary-box p-3 rounded-4">
+                                <div class="row g-3 text-center">
+                                    <div class="col-sm-3">
+                                        <div class="small text-muted">Age</div>
+                                        <div class="fw-semibold" id="summaryAge">—</div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="small text-muted">BMI</div>
+                                        <div class="fw-semibold" id="summaryBMI">—</div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="small text-muted">Blood Pressure</div>
+                                        <div class="fw-semibold" id="summaryBP">—</div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="small text-muted">Glucose</div>
+                                        <div class="fw-semibold" id="summaryGlucose">—</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-4" id="predictBtn">
+                                <span class="btn-text">Estimate My Risk</span>
+                            </button>
+                            <div class="small text-muted mt-3">This demo uses a simple trained model for educational purposes and is not medical advice.</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="card rounded-4 mb-4 result-section" id="resultSection">
+            <div class="card-body p-4 p-md-5">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-7">
+                        <div class="gauge-wrap">
+                            <svg class="gauge-svg" viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#8ec5ff"/>
+                                        <stop offset="55%" stop-color="#2563eb"/>
+                                        <stop offset="100%" stop-color="#f43f5e"/>
+                                    </linearGradient>
+                                    <filter id="glow">
+                                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                <path class="gauge-bg" d="M 30 155 A 120 120 0 0 1 270 155" fill="none" stroke-width="16" stroke-linecap="round"/>
+                                <path class="gauge-range" id="gaugeRange" d="M 150 35 A 120 120 0 0 1 270 155" fill="none" stroke="#f43f5e33" stroke-width="22" stroke-linecap="round"/>
+                                <path class="gauge-arc" id="gaugeArc" d="M 30 155 A 120 120 0 0 1 270 155" fill="none" stroke="url(#arcGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"/>
+                                <line class="gauge-needle" id="gaugeNeedle" x1="150" y1="155" x2="150" y2="45" stroke-width="3" stroke-linecap="round" filter="url(#glow)"/>
+                                <circle cx="150" cy="155" r="8" class="gauge-pivot"/>
+                                <circle cx="150" cy="155" r="4" class="gauge-pivot-inner"/>
+                                <text class="gauge-label-min" x="22" y="175" text-anchor="middle">0%</text>
+                                <text class="gauge-label-max" x="278" y="175" text-anchor="middle">100%</text>
+                            </svg>
+                            <div class="text-center">
+                                <div class="reading-label">Estimated 10-Year Risk</div>
+                                <div class="reading-value" id="readingValue">—</div>
+                                <div class="reading-sub" id="predictionLabel">Submit the form to view your risk result.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="result-meta p-3 rounded-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-semibold">Risk Assessment</span>
+                                <span class="badge rounded-pill" id="riskBadge">—</span>
+                            </div>
+                            <div class="fs-5 fw-semibold" id="predictionSummary">—</div>
+                            <p class="small text-muted mt-3 mb-0">The shaded zone on the gauge marks the high-risk range (50%+), where the model flags elevated 10-year CHD likelihood.</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="resultErrorWrap" class="mt-4" style="display:none;">
+                    <div class="alert-info rounded-4 p-3 text-danger" id="resultError"></div>
+                </div>
+                {% if prediction_text %}
+                <div class="alert alert-info mt-4 mb-0">{{ prediction_text }}</div>
+                {% endif %}
+            </div>
+        </section>
+
+        <footer class="text-center py-3 small text-muted">
+            Educational demo · Trained on the Framingham Heart Study dataset ·<b>By Nikhil Sanjay Kumar Srivastava</b>· Not a substitute for professional medical advice
+        </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        window.FLASK_RESULT = {{ flask_result | tojson if flask_result else 'null' }};
+    </script>
+</body>
+</html>
